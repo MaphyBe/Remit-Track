@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RemitTrack live demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--g:#0f5c3a;--g2:#e7f3ec;--amber:#f5c46b;--ink:#14231b;--mut:#66786d;--line:#e2eae5;--red:#b8431a;--redbg:#fbeae3;--bg:#f6f9f7}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:"Plus Jakarta Sans",system-ui,sans-serif;color:var(--ink);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:12px}
+.phone{width:340px;height:680px;max-width:100%;background:#fff;border:9px solid #101714;border-radius:42px;position:relative;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 18px 40px rgba(16,23,20,.18)}
+.status{display:flex;justify-content:space-between;padding:12px 22px 4px;font-size:11px;font-weight:700}
+#scr{flex:1;overflow-y:auto;padding:8px 18px 16px;scrollbar-width:none}
+#scr::-webkit-scrollbar{display:none}
+.nav{display:flex;border-top:1px solid var(--line);padding:8px 6px 12px}
+.nav button{flex:1;background:none;border:0;font:inherit;font-size:10px;font-weight:600;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:2px}
+.nav button span{font-size:17px}
+.nav .on{color:var(--g)}
+h1{font-size:19px;font-weight:800;letter-spacing:-.01em}
+h1 b{color:var(--g)}
+.top{display:flex;justify-content:space-between;align-items:center;margin:6px 0 14px}
+.bell{width:32px;height:32px;border-radius:10px;background:var(--amber);border:0;font-size:15px}
+.hello{font-size:17px;font-weight:700;margin-bottom:12px}
+.hero{background:var(--g);color:#fff;border-radius:18px;padding:16px}
+.hero small{font-size:11px;opacity:.8}
+.hero .amt{font-size:28px;font-weight:800;margin:2px 0}
+.badges{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.bd{font-size:10px;font-weight:700;padding:4px 8px;border-radius:99px;background:rgba(255,255,255,.18)}
+.bd.amb{background:var(--amber);color:#4a3200}
+button.bd{border:0;font-family:inherit;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.q{border:0;font:inherit;font-size:11px;font-weight:700;text-align:left;padding:11px 10px;border-radius:12px;background:var(--g2);color:var(--g);cursor:pointer}
+.q.warn{background:var(--redbg);color:var(--red)}
+.lbl{font-size:11px;font-weight:700;color:var(--mut);margin:14px 0 8px}
+.tx{width:100%;display:flex;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:14px;background:#fff;font:inherit;text-align:left;margin-bottom:8px;cursor:pointer}
+.av{width:34px;height:34px;border-radius:10px;background:var(--g2);color:var(--g);font-weight:800;font-size:12px;display:grid;place-items:center;flex:none}
+.tx .m{flex:1;min-width:0}
+.tx .m b{font-size:13px;display:block}
+.tx .m i{font-style:normal;font-size:11px;color:var(--mut)}
+.tx .r{text-align:right;font-size:13px;font-weight:700}
+.tx .r em{display:block;font-style:normal;font-size:10px;margin-top:2px}
+.s-transit{color:#b06a00}.s-ok{color:var(--g)}
+.back{background:none;border:0;font:inherit;font-size:12px;font-weight:700;color:var(--g);cursor:pointer;margin:6px 0 10px;padding:0}
+.card{background:var(--g);color:#fff;border-radius:18px;padding:14px 16px;font-size:11px}
+.card .amt{font-size:24px;font-weight:800;margin:2px 0 8px}
+.card div{display:flex;justify-content:space-between;padding:3px 0;opacity:.92}
+.steps{margin:16px 0 8px;position:relative}
+.st{display:flex;gap:12px;padding-bottom:18px;position:relative}
+.st:not(:last-child):before{content:"";position:absolute;left:10px;top:22px;bottom:0;width:2px;background:var(--line)}
+.st.done:not(:last-child):before{background:var(--g)}
+.dot{width:22px;height:22px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:11px;font-weight:800;background:var(--line);color:var(--mut)}
+.done .dot{background:var(--g);color:#fff}
+.now .dot{background:#14231b;color:#fff;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(20,35,27,.12)}}
+.st b{font-size:13px;display:block}
+.st i{font-style:normal;font-size:11px;color:var(--mut)}
+.now b{color:#1d4fb8}
+.btn{width:100%;border:0;font:inherit;font-size:13px;font-weight:700;padding:13px;border-radius:13px;background:var(--g);color:#fff;cursor:pointer;margin-top:6px}
+.btn.alt{background:var(--redbg);color:var(--red)}
+.btn:disabled{opacity:.6}
+.press{transform:scale(.96);animation:ring .9s ease-out;pointer-events:none}
+.inp.typing{outline:2px solid var(--g);border-color:var(--g)}
+@keyframes ring{from{box-shadow:0 0 0 0 rgba(15,92,58,.55)}to{box-shadow:0 0 0 16px rgba(15,92,58,0)}}
+.btn.sim{background:#fff;color:var(--g);border:1.5px dashed var(--g)}
+.inp{width:100%;font:inherit;font-size:13px;padding:12px;border:1.5px solid var(--line);border-radius:12px;margin:6px 0;background:#fff}
+.inp:focus{outline:2px solid var(--g);border-color:var(--g)}
+.inp[readonly]{background:var(--bg);color:var(--mut)}
+.fl{font-size:11px;font-weight:700;color:var(--mut);margin-top:10px;display:block}
+.drop{width:100%;margin-top:6px;font:inherit;font-size:12px;font-weight:600;padding:12px;border:1.5px dashed var(--line);border-radius:12px;background:var(--bg);color:var(--mut);cursor:pointer}
+.drop.on{border-style:solid;border-color:var(--g);background:var(--g2);color:var(--g)}
+.err{font-size:12px;color:var(--red);background:var(--redbg);padding:9px 11px;border-radius:10px;margin-top:8px}
+.link{background:none;border:0;font:inherit;font-size:12px;font-weight:700;color:var(--g);text-decoration:underline;cursor:pointer;padding:0;margin-top:6px}
+.tick{width:58px;height:58px;border-radius:50%;background:var(--g);color:#fff;font-size:28px;display:grid;place-items:center;margin:18px auto 12px}
+.center{text-align:center}
+.ref{display:inline-block;background:var(--g2);color:var(--g);font-weight:800;padding:7px 14px;border-radius:10px;margin:8px 0 14px;font-size:15px}
+.info{text-align:left;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:12px;margin-bottom:10px;line-height:1.5}
+.info b{display:block;font-size:11px;color:var(--mut)}
+.notif{background:#fff;border:1px solid var(--line);border-left:4px solid var(--amber);border-radius:14px;padding:12px 14px;font-size:12px;line-height:1.45;margin:10px 0;box-shadow:0 6px 16px rgba(16,23,20,.07);animation:in .35s ease-out}
+.notif.ok{border-left-color:var(--g);animation-delay:1.6s;animation-fill-mode:backwards}
+.notif b{display:block;font-size:13px;margin-bottom:2px}
+.nh{display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:var(--mut);margin-bottom:4px}
+@keyframes in{from{opacity:0;transform:translateY(-8px)}}
+.toast{position:absolute;left:50%;bottom:74px;transform:translateX(-50%);background:#14231b;color:#fff;font-size:11px;font-weight:600;padding:8px 12px;border-radius:10px;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.foot{display:flex;gap:8px;align-items:center;font-size:11px;color:var(--mut)}
+.foot button{font:inherit;font-size:11px;font-weight:700;padding:6px 12px;border-radius:99px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+button:focus-visible{outline:2px solid var(--g);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.now .dot,.notif{animation:none}}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="status"><span>9:41</span><span>5G</span></div>
+  <div id="scr"></div>
+  <nav class="nav" id="nav">
+    <button data-go="dash" id="n-dash"><span>⌂</span>Home</button>
+    <button data-go="track" id="n-track"><span>⌕</span>Search</button>
+    <button data-toast="Alerts aren’t part of this demo"><span>♫</span>Alerts</button>
+    <button data-toast="Profile isn’t part of this demo"><span>☺</span>Profile</button>
+  </nav>
+  <div class="toast" id="toast"></div>
+</div>
+<div class="foot">Sample data only <button id="play">Play full demo</button><button id="restart">Restart demo</button></div>
+
+<script>
+var T={
+  vigi:{key:"vigi",imto:"Wise",ini:"GB",from:"Emeka Okonkwo",amt:242600,date:"Apr 17",fx:"£150 at ₦1,617.33",ref:"WSE-20260417-8841",sess:"000013260417094512884100284391",eta:"Today, 4:30 PM",done:3,times:["Apr 17, 9:12 AM","Apr 17, 9:45 AM","Apr 17, 9:46 AM","Awaiting bank credit"]},
+  remi:{key:"remi",imto:"Remitly",ini:"CA",from:"Caroline Weyimi",amt:378850,date:"Apr 12",fx:"C$350 at ₦1,082.43",ref:"RMT-20260412-3307",sess:"000013260412151208443200917755",eta:"Credited",done:4,times:["Apr 12, 3:02 PM","Apr 12, 3:10 PM","Apr 12, 3:12 PM","Apr 12, 3:12 PM"]}
+};
+var STEPS=["Transfer initiated","Transaction processed","NIP instruction sent","Beneficiary credited"];
+var S={screen:"dash",cur:null,dispute:null,att:false,err:"",val:"",cs:0};
+var pT=[],tI;
+function press(b){if(b){b.classList.add("press")}}
+function typeId(txt){
+  var el=$("sid"),i=0;el.classList.add("typing");
+  tI=setInterval(function(){i++;el.value=txt.slice(0,i);if(i>=txt.length)clearInterval(tI)},70);
+}
+function submit(){S.dispute="RT-"+(1000+Math.floor(Math.random()*9000));S.cs=2;go("done")}
+function stopAll(){clearInterval(tI);pT.forEach(clearTimeout);pT=[];T=JSON.parse(T0);S={screen:"dash",cur:null,dispute:null,att:false,err:"",val:"",cs:0,auto:false};$("play").textContent="Play full demo";render()}
+function play(){
+  if(S.auto){stopAll();return}
+  stopAll();S.auto=true;$("play").textContent="Stop demo";
+  var q=[
+    [1000,function(){press(document.querySelector('.q[data-go="track"]'))}],
+    [900,function(){go("track")}],
+    [1300,function(){typeId(T.vigi.sess)}],
+    [2800,function(){var b=document.querySelector("[data-lookup]");press(b);b.textContent="Tracking…"}],
+    [1200,function(){S.cur=T.vigi;go("journey")}],
+    [3200,function(){press(document.querySelector("[data-report]"))}],
+    [1000,function(){go("report")}],
+    [2200,function(){$("scr").scrollTo({top:$("scr").scrollHeight,behavior:"smooth"})}],
+    [1800,function(){var b=$("sub");press(b);b.textContent="Submitting…"}],
+    [1100,function(){submit();toast("Dispute submitted")}],
+    [4500,function(){toClosed()}],
+    [4200,function(){press(document.querySelector('#scr .btn[data-go="dash"]'))}],
+    [1000,function(){go("dash");S.auto=false;$("play").textContent="Play full demo"}]
+  ],t=0;
+  q.forEach(function(x){t+=x[0];pT.push(setTimeout(x[1],t))});
+}
+var $=function(i){return document.getElementById(i)};
+var n=function(x){return "₦"+x.toLocaleString("en-NG")};
+
+function dash(){
+  var v=T.vigi,r=T.remi;
+  var open=S.dispute,tr=(v.done<4)+(r.done<4);
+  return '<div class="top"><h1>Remit<b>Track</b></h1><button class="bell" data-toast="No new alerts">🔔</button></div>'+
+  '<div class="hello">Hello, Vida 👋</div>'+
+  '<div class="hero"><small>Expected this month</small><div class="amt">'+n(v.amt+r.amt)+'</div><small>Tracking: 2 inflows</small>'+
+  '<div class="badges">'+(tr?'<span class="bd">↻ '+tr+' in transit</span>':'<span class="bd">✓ All credited</span>')+(open?'<button class="bd amb" data-go="'+(S.cs===5?'closed':'done')+'">Dispute '+open+(S.cs===5?' closed':' open')+' ›</button>':(v.done<4?'<span class="bd amb">⚠ SLA alert</span>':''))+'</div></div>'+
+  '<div class="grid"><button class="q" data-go="track">🔍 Track transfer</button><button class="q" data-go="track">⌗ Enter session ID</button>'+
+  '<button class="q warn" data-report="vigi">⚠ Report issue</button><button class="q" data-scroll="hist">⇅ Incoming transfers</button></div>'+
+  '<div class="lbl" id="hist">TRANSACTION HISTORY</div>'+row(v)+row(r);
+}
+function row(t){
+  var ok=t.done===4;
+  return '<button class="tx" data-open="'+t.key+'"><div class="av">'+t.ini+'</div><div class="m"><b>'+t.imto+'</b><i>From '+t.from+' · '+t.date+'</i></div><div class="r">'+n(t.amt)+'<em class="'+(ok?'s-ok':'s-transit')+'">● '+(ok?'Credited':'In transit')+'</em></div></button>';
+}
+function track(){
+  return '<button class="back" data-go="dash">‹ Back</button><h1>Track a transfer</h1>'+
+  '<p style="font-size:12px;color:var(--mut);margin:6px 0 12px">Enter the 30-digit NIP Session ID from your bank’s credit alert or your sender’s receipt.</p>'+
+  '<label class="fl" for="sid">NIP Session ID</label><input class="inp" id="sid" inputmode="numeric" maxlength="30" placeholder="30-digit session ID" value="'+S.val+'">'+
+  (S.err?'<div class="err">'+S.err+'</div>':'')+
+  '<button class="btn" data-lookup style="margin-top:14px">Track transfer</button>';
+}
+function journey(){
+  var t=S.cur,ok=t.done===4,h='';
+  STEPS.forEach(function(s,i){
+    var c=i<t.done?"done":(i===t.done?"now":"");
+    h+='<div class="st '+c+'"><div class="dot">'+(i<t.done?"✓":i+1)+'</div><div><b>'+s+'</b><i>'+t.times[i]+'</i></div></div>';
+  });
+  return '<button class="back" data-go="dash">‹ Home</button>'+
+  '<div class="card"><span>'+t.imto+' · From '+t.from+'</span><div class="amt">'+n(t.amt)+'</div>'+
+  '<div><span>FX rate</span><span>'+t.fx+'</span></div><div><span>Reference</span><span>'+t.ref+'</span></div><div><span>ETA</span><span>'+t.eta+'</span></div></div>'+
+  '<div class="steps">'+h+'</div>'+
+  (ok?'<p class="center" style="font-size:12px;color:var(--g);font-weight:700">Funds credited to your account'+(S.dispute&&t.key==="vigi"?'<br>Dispute '+S.dispute+' closed':'')+'</p>':'<button class="btn alt" data-report="'+t.key+'">Money hasn’t arrived? Report this</button>');
+}
+function report(){
+  var t=S.cur;
+  return '<button class="back" data-back>‹ Back</button><h1>Report a problem</h1>'+
+  '<p style="font-size:12px;color:var(--mut);margin:6px 0">We filled in the transfer details for you.</p>'+
+  '<label class="fl">IMTO</label><input class="inp" readonly value="'+t.imto+'">'+
+  '<label class="fl">Amount</label><input class="inp" readonly value="'+n(t.amt)+'">'+
+  '<label class="fl">Transfer date</label><input class="inp" readonly value="'+t.date+', 2026">'+
+  '<label class="fl">Reference</label><input class="inp" readonly value="'+t.ref+'">'+
+  '<label class="fl" for="iss">What went wrong?</label><select class="inp" id="iss"><option>Money hasn’t arrived</option><option>Delayed past the ETA</option><option>Wrong amount credited</option></select>'+
+  '<span class="fl">Evidence <em style="font-weight:500">(optional)</em></span><button class="drop'+(S.att?' on':'')+'" data-att>'+(S.att?'✓ transaction-receipt.pdf attached · tap to remove':'+ Add a transaction receipt')+'</button>'+
+  '<button class="btn" id="sub" data-submit style="margin-top:14px">Submit dispute</button>';
+}
+function done(){
+  var t=T.vigi;
+  return '<div class="tick" style="margin-top:22px">✓</div><div class="center"><h1>Dispute submitted</h1><div class="ref">'+S.dispute+'</div></div>'+
+  '<div class="info"><b>Case reference</b>'+S.dispute+' · '+t.imto+' · '+n(t.amt)+'</div>'+
+  '<div class="info"><b>Resolution time (SLA)</b>72 hours.</div>'+
+  '<div class="info"><b>Routed to</b>Sending bank’s team and the NIBSS reconciliation queue.</div>'+
+  '<button class="btn sim" data-next>Demo: see what happens next</button>';
+}
+function closed(){
+  var t=T.vigi;
+  return '<div class="notif"><div class="nh"><span>RemitTrack</span><span>now</span></div><b>Money credited</b>'+n(t.amt)+' from '+t.from+' via '+t.imto+' has been credited to your account.</div>'+
+  '<div class="notif ok"><div class="nh"><span>RemitTrack</span><span>now</span></div><b>Case closed</b>Your dispute '+S.dispute+' has been resolved and closed.</div>'+
+  '<div class="info" style="margin-top:14px"><b>Case reference</b>'+S.dispute+'</div>'+
+  '<div class="info"><b>Status</b>Closed. Funds credited.</div>'+
+  '<button class="btn" data-go="dash">Back to dashboard</button>';
+}
+function toClosed(){
+  var v=T.vigi;v.done=4;v.times[3]="Apr 17, 5:18 PM";v.eta="Credited";S.cs=5;go("closed");
+}
+var V={dash:dash,track:track,journey:journey,report:report,done:done,closed:closed};
+function render(){
+  $("scr").innerHTML=V[S.screen]();
+  $("scr").scrollTop=0;
+  $("n-dash").className=(S.screen==="dash")?"on":"";
+  $("n-track").className=(S.screen==="track")?"on":"";
+}
+function go(s){S.screen=s;S.err="";if(s==="dash"||s==="track")S.val="";render()}
+var tt;
+function toast(m){var e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){e.classList.remove("show")},1600)}
+
+document.querySelector(".phone").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b||S.auto)return;
+  var d=b.dataset;
+  if(d.go){go(d.go)}
+  else if(d.open){S.cur=T[d.open];go("journey")}
+  else if(d.report){if(T[d.report].done===4){toast("Nothing to report: already credited");return}S.cur=T[d.report];S.att=false;go("report")}
+  else if(d.back!==undefined){go("journey")}
+  else if(d.sample!==undefined){S.val=T.vigi.sess;S.err="";render()}
+  else if(d.lookup!==undefined){
+    var v=$("sid").value.replace(/\s/g,"");S.val=v;
+    var hit=(v===T.vigi.sess||v.toUpperCase()===T.vigi.ref)?T.vigi:((v===T.remi.sess||v.toUpperCase()===T.remi.ref)?T.remi:null);
+    if(hit){S.cur=hit;go("journey")}
+    else{S.err=v?"No transfer found for that ID. Check the 30-digit NIP Session ID in your bank alert.":"Enter a 30-digit NIP Session ID, or use the sample.";render();$("sid").focus()}
+  }
+  else if(d.att!==undefined){S.att=!S.att;var i=$("iss").selectedIndex;render();$("iss").selectedIndex=i}
+  else if(d.submit!==undefined){submit()}
+  else if(d.next!==undefined){toClosed()}
+  else if(d.scroll){$(d.scroll).scrollIntoView({behavior:"smooth",block:"start"})}
+  else if(d.toast){toast(d.toast)}
+});
+var T0=JSON.stringify(T);
+$("restart").addEventListener("click",stopAll);
+$("play").addEventListener("click",play);
+render();
+var played=false,ph=document.querySelector(".phone");
+function auto(){if(!played&&!S.auto){played=true;play()}}
+if("IntersectionObserver" in window){
+  new IntersectionObserver(function(es){
+    if(es[0].isIntersecting){setTimeout(function(){if(es[0].isIntersecting)auto()},700)}
+    else{if(S.auto)stopAll();played=false}
+  },{threshold:.4}).observe(ph);
+}else{setTimeout(auto,800)}
+</script>
+</body>
+</html>
